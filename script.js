@@ -29,11 +29,11 @@ function loadSlots() {
             return response.json();
         })
         .then(function(data) {
-            // Show slots from backend
+            
             displaySlots(data.available_slots);
         })
         .catch(function() {
-            // If backend fails, show sample slots
+            
             displaySlots(sampleSlots);
         });
 

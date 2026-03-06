@@ -47,7 +47,7 @@ class BookSlot(Resource):
 
             slot_id = data.get("slot_id")
             name = data.get("name")
-
+            
             connection = conn.db_connection()
 
 
@@ -79,9 +79,6 @@ class GetBookedSlots(Resource):
         
         try:
             connection = conn.db_connection()
-
-            if not connection:
-                return {"res_status": False, "msg": "Database Connection Failed"}
 
             cur = connection.cursor()
 
