@@ -1,91 +1,141 @@
+
 const slotsDiv = document.getElementById("slots");
 const bookedDiv = document.getElementById("bookedSlots");
+
 
 const API_URL = "http://localhost:5050";
 
 
-function loadSlots(){
 
-fetch(API_URL + "/get_slots")
-.then(res => res.json())
-.then(data => {
+const sampleSlots = [
+    { id: 1, slot_time: "09:00 AM" },
+    { id: 2, slot_time: "10:00 AM" },
+    { id: 3, slot_time: "11:00 AM" },
+    { id: 4, slot_time: "02:00 PM" }
+];
 
-slotsDiv.innerHTML = "";
 
-data.available_slots.forEach(slot => {
+const sampleBookedSlots = [
+    { slot_time: "12:00 PM", booked_by: "Rahul" },
+    { slot_time: "01:00 PM", booked_by: "Priya" },
+    { slot_time: "03:00 PM", booked_by: "Arjun" }
+];
 
-let btn = document.createElement("button");
 
-btn.innerText = slot.slot_time;
+function loadSlots() {
 
-btn.onclick = function(){
-
-let name = prompt("Enter your name");
-
-if(!name){
-alert("Enter name");
-return;
-}
-
-fetch(API_URL + "/book_slot",{
-
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-slot_id:slot.id,
-name:name
-})
-
-})
-.then(res=>res.json())
-.then(response=>{
-
-alert(response.msg);
-
-loadSlots();
-loadBookedSlots();
-
-});
-
-};
-
-slotsDiv.appendChild(btn);
-
-});
-
-});
+    fetch(API_URL + "/get_slots")
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            // Show slots from backend
+            displaySlots(data.available_slots);
+        })
+        .catch(function() {
+            // If backend fails, show sample slots
+            displaySlots(sampleSlots);
+        });
 
 }
 
 
+function displaySlots(slots) {
 
-function loadBookedSlots(){
+   
+    slotsDiv.innerHTML = "";
 
-fetch(API_URL + "/booked_slots")
-.then(res=>res.json())
-.then(data=>{
+    
+    slots.forEach(function(slot) {
 
-bookedDiv.innerHTML = "";
+       
+        let button = document.createElement("button");
+        button.innerText = slot.slot_time;
 
-data.booked_slots.forEach(slot=>{
+        button.onclick = function() {
 
-let div = document.createElement("div");
+            let name = prompt("Enter your name");
 
-div.className = "booked-item";
+            if (!name) {
+                alert("Please enter your name");
+                return;
+            }
 
-div.innerText = slot.slot_time + " - " + slot.booked_by;
+           
+            fetch(API_URL + "/book_slot", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    slot_id: slot.id,
+                    name: name
+                })
+            })
+            .then(function(res) {
+                return res.json();
+            })
+            .then(function(response) {
 
-bookedDiv.appendChild(div);
+                alert(response.msg);
 
-});
+                loadSlots();
+                loadBookedSlots();
+            })
+            .catch(function() {
 
-});
+                alert("Demo mode: booking not saved");
+
+            });
+
+        };
+
+       
+        slotsDiv.appendChild(button);
+
+    });
 
 }
 
+
+
+function loadBookedSlots() {
+
+    fetch(API_URL + "/booked_slots")
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+
+            displayBookedSlots(data.booked_slots);
+
+        })
+        .catch(function() {
+
+            displayBookedSlots(sampleBookedSlots);
+
+        });
+
+}
+
+
+function displayBookedSlots(slots) {
+
+    bookedDiv.innerHTML = "";
+
+    slots.forEach(function(slot) {
+
+        let div = document.createElement("div");
+
+        div.className = "booked-item";
+
+        div.innerText = slot.slot_time + " - " + slot.booked_by;
+
+        bookedDiv.appendChild(div);
+
+    });
+
+}
 
 
 loadSlots();
